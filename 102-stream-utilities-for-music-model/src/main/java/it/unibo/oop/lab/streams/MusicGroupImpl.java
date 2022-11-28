@@ -84,12 +84,12 @@ public final class MusicGroupImpl implements MusicGroup {
         return Optional.of(
             this.albums.keySet().stream()
                     .filter(n -> this.durationOfAlbum(n).isPresent())
-                    .reduce((n1, n2) -> this.durationOfAlbum(n1).get() > this.durationOfAlbum(n2).get() ? n1 : n2)
+                    .reduce((n1, n2) -> this.durationOfAlbum(n1).get() >this.durationOfAlbum(n2).get() ? n1 : n2)
                     .get()
         );
     }
 
-    private Optional<Double> durationOfAlbum(final String album) {
+    private Optional<Double> durationOfAlbum(final String album){
         return Optional.of(
             this.songs.stream()
                     .filter(s -> s.getAlbumName().isPresent())
