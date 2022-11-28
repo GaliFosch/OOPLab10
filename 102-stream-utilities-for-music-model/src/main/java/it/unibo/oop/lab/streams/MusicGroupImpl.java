@@ -31,42 +31,72 @@ public final class MusicGroupImpl implements MusicGroup {
 
     @Override
     public Stream<String> orderedSongNames() {
-        return null;
+        return this.songs.stream()
+                .map(Song::getSongName)
+                .sorted();
     }
 
     @Override
     public Stream<String> albumNames() {
-        return null;
+        return this.albums.keySet().stream();
     }
 
     @Override
     public Stream<String> albumInYear(final int year) {
-        return null;
+        return this.albumNames().filter(n -> this.albums.get(n)==year);
     }
 
     @Override
     public int countSongs(final String albumName) {
-        return -1;
+        return (int) this.songs.stream()
+                .filter(s -> s.getAlbumName().isPresent())
+                .filter(s -> s.getAlbumName().get().equals(albumName))
+                .count();
     }
 
     @Override
     public int countSongsInNoAlbum() {
-        return -1;
+        return (int) this.songs.stream()
+                .filter(s -> !s.getAlbumName().isPresent())
+                .count();
     }
 
     @Override
     public OptionalDouble averageDurationOfSongs(final String albumName) {
-        return null;
+        return this.songs.stream()
+                .filter(s -> s.getAlbumName().isPresent())
+                .filter(s -> s.getAlbumName().get().equals(albumName))
+                .mapToDouble(s -> s.getDuration())
+                .average();
     }
 
     @Override
     public Optional<String> longestSong() {
-        return null;
+        return Optional.of(
+                this.songs.stream()
+                .reduce((s1, s2) -> s1.getDuration()>s2.getDuration() ? s1 : s2)
+                .get().getSongName()
+            );
     }
 
     @Override
     public Optional<String> longestAlbum() {
-        return null;
+        return Optional.of(
+            this.albums.keySet().stream()
+                    .filter(n -> this.durationOfAlbum(n).isPresent())
+                    .reduce((n1, n2) -> this.durationOfAlbum(n1).get()>this.durationOfAlbum(n2).get() ? n1 : n2)
+                    .get()
+        );
+    }
+
+    private Optional<Double> durationOfAlbum(final String album){
+        return Optional.of(
+            this.songs.stream()
+                    .filter(s -> s.getAlbumName().isPresent())
+                    .filter(s -> s.getAlbumName().get().equals(album))
+                    .mapToDouble(s -> s.getDuration())
+                    .sum()
+        );
     }
 
     private static final class Song {
