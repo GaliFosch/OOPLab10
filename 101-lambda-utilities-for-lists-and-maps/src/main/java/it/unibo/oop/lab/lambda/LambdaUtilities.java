@@ -1,7 +1,9 @@
 package it.unibo.oop.lab.lambda;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -59,7 +61,7 @@ public final class LambdaUtilities {
      */
     public static <T> List<Optional<T>> optFilter(final List<T> list, final Predicate<T> pre) {
         final List<Optional<T>> l = new ArrayList<>(list.size());
-        list.forEach(t -> l.add(Optional.of(t).filter(pre)));
+        list.forEach(t -> l.add(Optional.ofNullable(t).filter(pre)));
         return l;
     }
 
@@ -81,11 +83,9 @@ public final class LambdaUtilities {
          */
         final Map<R, Set<T>> map = new HashMap<>();
         list.forEach(t -> {
-            Set<T> setT = Set.of(t);
-            map.merge(op.apply(t), setT, (o , v) -> {
-                List<T> l = new ArrayList<>(o);
-                v.forEach(val -> l.add(val));
-                return Set.copyOf(l);
+            map.merge(op.apply(t), new HashSet<>(Arrays.asList(t)), (o , v) -> {
+                o.addAll(v);
+                return o;
             });
         });
         return map;
